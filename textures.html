@@ -42,9 +42,15 @@ main()
     float c = cos(rad);
     float s = sin(rad);
 
-    mat2 rot = mat2( c, s,-s, c );
+    float x = (fTexCoord.x - 0.5) * c - (fTexCoord.y - 0.5) * s;
+    float y = (fTexCoord.x - 0.5) * s + (fTexCoord.y - 0.5) * c;
 
-    gl_FragColor = texture2D( texture, (rot * fTexCoord) * scale + offset * scale );
+    x += 0.5;
+    y += 0.5;
+
+    vec2 texCoord = vec2(x, y);
+
+    gl_FragColor = texture2D(texture, texCoord * scale + offset);
 }
 </script>
 

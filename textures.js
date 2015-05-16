@@ -16,10 +16,10 @@ var texCoordsArray = [];
 var texture;
 
 var texCoord = [
-    vec2(-0.5, -0.5),
-    vec2(-0.5, 0.5),
-    vec2(0.5, 0.5),
-    vec2(0.5, -0.5)
+    vec2(0.0, 0.0),
+    vec2(0.0, 1.0),
+    vec2(1.0, 1.0),
+    vec2(1.0, 0.0)
 ];
 
 var vertices = [
@@ -52,7 +52,7 @@ var transforms = [
 var rot = true;
 var scroll = false;
 var texSpin = false;
-var offset = [0.75, 0.75];
+var offset = [0.5, 0.5];
 var imageTheta = 0.0;
 var projectionLoc, modelViewLoc, offsetLoc, imageThetaLoc, scaleLoc;
 
@@ -218,7 +218,7 @@ var render = function(){
         modelMatrix = mult(transforms[i], modelMatrix);
         gl.uniformMatrix4fv(modelViewLoc, false, flatten(mult(viewMatrix, modelMatrix)));
 
-        gl.uniform2fv(offsetLoc, i ? offset : [0.5, 0.5]);
+        gl.uniform2fv(offsetLoc, i ? offset : [0.0, 0.0]);
         gl.uniform1f(imageThetaLoc, i ? 0.0 : imageTheta);
         gl.uniform1f(scaleLoc, i ? 2.0 : 1.0);
 
@@ -230,9 +230,7 @@ var render = function(){
         theta[1] = (theta[1] + 0.5) % 360;
     }
     if (scroll){
-        offset[0] += 0.01;
-        if (offset[0] > 1.5)
-            offset[0] = 0.5;
+        offset[0]= (offset[0] + 0.01) % 1.0;
     }
     if (texSpin){
         imageTheta = (imageTheta + 1) % 360;;
