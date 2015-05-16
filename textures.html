@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    canvas { background: blue; }
+</style>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute vec4 vPosition;
+attribute vec2 vTexCoord;
+
+uniform vec4 vColor;
+uniform mat4 modelView;
+uniform mat4 projection;
+
+varying vec2 fTexCoord;
+
+
+void main() 
+{                
+    fTexCoord = vTexCoord;
+    gl_Position = projection * modelView * vPosition;
+} 
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying  vec2 fTexCoord;
+
+uniform sampler2D texture;
+uniform vec2 offset;
+uniform float scale;
+uniform float imageTheta;
+
+void
+main()
+{
+    float rad = radians(imageTheta);
+    float c = cos(rad);
+    float s = sin(rad);
+
+    mat2 rot = mat2( c, s,-s, c );
+
+    gl_FragColor = texture2D( texture, (rot * fTexCoord) * scale + offset * scale );
+}
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="textures.js"></script>
+
+
+<body>
+<canvas id="gl-canvas" width="960" height="540">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+<img id = "NachenImage" src = "Nachen.jpg" hidden></img>
+<img id = "SmallbergImage" src = "Smallberg.jpg" hidden></img>
+</body>
+</html>
