@@ -57,21 +57,6 @@ var imageTheta = 0.0;
 var projectionLoc, modelViewLoc, offsetLoc, imageThetaLoc, scaleLoc;
 
 
-function matTimesVec(mat, vec)
-{   
-    var result = [];
-
-    //assume mat and vec are same length
-    for(var i = 0; i < mat.length; i++){
-        var sum = 0;
-        for(var j = 0; j < vec.length; j++){
-            sum += mat[i][j] * vec[j];
-        }
-        result.push(sum);
-    }
-    return result;
-}
-
 function configureTextures() {
     NachenTex = gl.createTexture();
 
@@ -179,19 +164,19 @@ window.onload = function init() {
     window.onkeypress = function(event) {
         var key = String.fromCharCode(event.keyCode).toLowerCase();
         switch(key){
-            case 'i':
+            case 'i': //Zoom in
             camera.z += 0.1;
             break;
-            case 'o':
+            case 'o': //Zoom out
             camera.z -= 0.1;
             break;
-            case 'r':
+            case 'r': //Start and stop the rotation of both cubes
             rot = !rot;
             break;
-            case 's':
+            case 's': //Start and stop the scrolling of one of the textures
             scroll = !scroll;
             break;
-            case 't':
+            case 't': //Start and stop the scrolling of one of the textures
             texSpin = !texSpin;
             break;
         }
@@ -211,13 +196,23 @@ var render = function(){
     var viewMatrix = translate(camera.x, camera.y, camera.z);
 
     for(var i = 0; i < transforms.length; i++){
+        //Send the shader the new texture
         gl.uniform1i(gl.getUniformLocation(program, "texture"), i);
 
+        //Account for the cubes rotation aroudn their respective axes
         var modelMatrix = rotate(theta[i], axes[i]);
 
         modelMatrix = mult(transforms[i], modelMatrix);
         gl.uniformMatrix4fv(modelViewLoc, false, flatten(mult(viewMatrix, modelMatrix)));
 
+        /*When the first cube is being drawn:
+            -Send a 0 value for the offset since no offset is needed
+            -Send the current angle for the texture, since this is the rotating texture cube
+            -Send a scalar value of 1, since the texture is not zoomed in or out
+        When the second cube is being drawn:
+            -Send the current offset for the scrolling texture
+            -Send an angle of 0, since the texture is not rotating
+            -Send a scalar of 2 to zoom out the texture*/
         gl.uniform2fv(offsetLoc, i ? offset : [0.0, 0.0]);
         gl.uniform1f(imageThetaLoc, i ? 0.0 : imageTheta);
         gl.uniform1f(scaleLoc, i ? 2.0 : 1.0);
@@ -226,6 +221,8 @@ var render = function(){
     }
 
     if (rot){
+        //1 is used for 10 rpm
+        //0.5 is used for 5 rpm
         theta[0] = (theta[0] + 1) % 360;
         theta[1] = (theta[1] + 0.5) % 360;
     }
@@ -233,7 +230,8 @@ var render = function(){
         offset[0]= (offset[0] + 0.01) % 1.0;
     }
     if (texSpin){
-        imageTheta = (imageTheta + 1) % 360;;
+        //1.5 is used for 15 rpm
+        imageTheta = (imageTheta + 1.5) % 360;;
     }
     requestAnimFrame(render);
 }
